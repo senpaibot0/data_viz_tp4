@@ -1,7 +1,7 @@
+
 '''
     Provides the template for the tooltips.
 '''
-
 
 def get_bubble_hover_template():
     '''
@@ -16,6 +16,11 @@ def get_bubble_hover_template():
         returns:
             The content of the tooltip
     '''
-    # TODO : Generate tooltip
-
-    return ''
+    # Define the hover template with bold labels and normal values
+    hover_template = (
+        "<b>Country</b>: %{hovertext}<br>"
+        "<b>Population</b>: %{marker.size:,}<br>"
+        "<b>GDP</b>: %{x:,.2f} $ USD<br>"
+        "<b>CO2</b>: %{y:.2f} metric tonnes"
+    )
+    return hover_template

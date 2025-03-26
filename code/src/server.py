@@ -1,6 +1,7 @@
 '''
     Contains the server to run our application.
 '''
+from flask import *
 from flask_failsafe import failsafe
 
 

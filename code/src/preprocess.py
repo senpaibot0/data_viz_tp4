@@ -1,7 +1,8 @@
+
 '''
     Contains some functions to preprocess the data used in the visualisation.
 '''
-
+import pandas as pd  # Ensure pandas is imported
 
 def round_decimals(my_df):
     '''
@@ -12,9 +13,9 @@ def round_decimals(my_df):
         returns:
             The dataframe with rounded numbers
     '''
-    # TODO : Round the dataframe
-    return None
-
+    # Round GDP and CO2 columns to 2 decimal places
+    my_df[['GDP', 'CO2']] = my_df[['GDP', 'CO2']].round(2)
+    return my_df
 
 def get_range(col, df1, df2):
     '''
@@ -28,9 +29,10 @@ def get_range(col, df1, df2):
         returns:
             The minimum and maximum values across the two dataframes
     '''
-    # TODO : Get the range from the dataframes
-    return []
-
+    # Calculate min and max across both dataframes for the specified column
+    min_val = min(df1[col].min(), df2[col].min())
+    max_val = max(df1[col].max(), df2[col].max())
+    return [min_val, max_val]
 
 def combine_dfs(df1, df2):
     '''
@@ -47,9 +49,15 @@ def combine_dfs(df1, df2):
             containing the value 2000 or 2015, depending on its
             original dataframe.
     '''
-    # TODO : Combine the two dataframes
-    return None
-
+    # Add 'Year' column to each dataframe
+    df1 = df1.copy()
+    df2 = df2.copy()
+    df1['Year'] = 2000
+    df2['Year'] = 2015
+    
+    # Concatenate the dataframes
+    combined_df = pd.concat([df1, df2], ignore_index=True)
+    return combined_df
 
 def sort_dy_by_yr_continent(my_df):
     '''
@@ -60,5 +68,7 @@ def sort_dy_by_yr_continent(my_df):
         returns:
             The sorted dataframe.
     '''
-    # TODO : Sort the dataframe
-    return None
+    # Sort by 'Year' and then 'Continent'
+    sorted_df = my_df.sort_values(by=['Year', 'Continent'])
+    return sorted_df
+

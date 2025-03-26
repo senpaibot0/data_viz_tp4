@@ -3,9 +3,7 @@
 '''
 
 import plotly.express as px
-
 import hover_template
-
 
 def get_plot(my_df, gdp_range, co2_range):
     '''
@@ -16,8 +14,7 @@ def get_plot(my_df, gdp_range, co2_range):
 
         The discrete color scale (sequence) to use is Set1 (see : https://plotly.com/python/discrete-color/)
 
-        The markers' maximum size is 30 and their minimum
-        size is 6.
+        The markers' maximum size is 30 and their minimum size is 6.
 
         Args:
             my_df: The dataframe to display
@@ -26,9 +23,30 @@ def get_plot(my_df, gdp_range, co2_range):
         Returns:
             The generated figure
     '''
-    # TODO : Define figure with animation
-    return None
+    # Create the animated bubble chart using Plotly Express
+    fig = px.scatter(
+        my_df,
+        x="GDP",
+        y="CO2",
+        size="Population",
+        color="Continent",
+        animation_frame="Year",  # Animate based on the 'Year' column
+        hover_name="Country Name",
+        log_x=True,  # Log scale for x-axis (GDP)
+        log_y=True,  # Log scale for y-axis (CO2)
+        range_x=gdp_range,  # Set x-axis range
+        range_y=co2_range,  # Set y-axis range
+        size_max=30,  # Maximum marker size
+        color_discrete_sequence=px.colors.qualitative.Set1  # Use Set1 color sequence
+    )
+    
+    # Ensure minimum marker size is 6 by adjusting the figure's data
+    for frame in fig.frames:
+        for trace in frame.data:
+            if 'marker' in trace and 'size' in trace['marker']:
+                trace['marker']['sizemin'] = 6
 
+    return fig
 
 def update_animation_hover_template(fig):
     '''
@@ -41,10 +59,18 @@ def update_animation_hover_template(fig):
         Returns:
             The updated figure
     '''
-
-    # TODO : Set the hover template
-    return None
-
+    # Get the hover template from hover_template.py
+    hover_temp = hover_template.get_bubble_hover_template()
+    
+    # Update the main figure's hover template
+    fig.update_traces(hovertemplate=hover_temp)
+    
+    # Update the hover template for each frame in the animation
+    for frame in fig.frames:
+        for trace in frame.data:
+            trace.hovertemplate = hover_temp
+    
+    return fig
 
 def update_animation_menu(fig):
     '''
@@ -53,12 +79,43 @@ def update_animation_menu(fig):
 
         Args:
             fig: The figure containing the menu to update
-        Returns
+        Returns:
             The updated figure
     '''
-    # TODO : Update animation menu
-    return None
-
+    # Update the animation menu buttons
+    fig.update_layout(
+        updatemenus=[
+            dict(
+                buttons=[
+                    dict(
+                        args=[None, {"frame": {"duration": 500, "redraw": True}, "fromcurrent": True}],
+                        label="Play",
+                        method="animate"
+                    ),
+                    # Remove the 'Stop' button by not including a pause option
+                ],
+                direction="left",
+                pad={"r": 10, "t": 87},
+                showactive=False,
+                type="buttons",
+                x=0.1,
+                xanchor="right",
+                y=0,
+                yanchor="top"
+            )
+        ],
+        # Add a slider with year labels
+        sliders=[dict(
+            steps=[
+                dict(args=[[f.name], {"frame": {"duration": 0, "redraw": True}, "mode": "immediate"}],
+                     label=str(f.name), method="animate") for f in fig.frames
+            ],
+            active=0,
+            currentvalue={"prefix": "Year: ", "font": {"size": 20}},
+            pad={"t": 50}
+        )]
+    )
+    return fig
 
 def update_axes_labels(fig):
     '''
@@ -69,9 +126,11 @@ def update_axes_labels(fig):
         Returns:
             The updated figure
     '''
-    # TODO : Update labels
-    return None
-
+    fig.update_layout(
+        xaxis_title="GDP per capita ($ USD)",
+        yaxis_title="CO2 emissions per capita (metric tonnes)"
+    )
+    return fig
 
 def update_template(fig):
     '''
@@ -80,21 +139,20 @@ def update_template(fig):
 
         Args:
             fig: The figure to update
-        Returns
+        Returns:
             The updated figure
     '''
-    # TODO : Update template
-    return None
-
+    fig.update_layout(template="simple_white")
+    return fig
 
 def update_legend(fig):
     '''
-        Updated the legend title
+        Updates the legend title
 
         Args:
             fig: The figure to be updated
         Returns:
             The updated figure
     '''
-    # TODO : Update legend
-    return None
+    fig.update_layout(legend_title_text="Continent")
+    return fig
